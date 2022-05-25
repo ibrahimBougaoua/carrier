@@ -71,12 +71,12 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        if (!Auth::attempt($request->only('email', 'password')))
-        {
-            return $this->failure('Unauthorized');
-        }
+        $this->validateLogin($request);
 
-        $user = User::where('email', $request['email'])->firstOrFail();
+        $user = User::where('email', $request['email'])->first();
+
+        if( ! $user )
+            return $this->failure('Unauthorized.');
 
         $token = $user->createToken('auth_token')->plainTextToken;
         return $this->success(
@@ -96,6 +96,16 @@ class AuthController extends Controller
                 'user' => new UserResource($request->user()),
             ]
         );
+    }
+
+    public function isAdmin()
+    {
+            return $this->success(
+                'Hi welcome to home',
+                [
+                    'isAdmin' => Auth::user()->role == 'admin' ? true : false,
+                ]
+            );
     }
 
     public function profile(Request $request)

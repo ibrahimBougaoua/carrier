@@ -246,10 +246,7 @@ class PostController extends Controller
     {
         try {
 
-            if(Auth::user()->role == 'admin')
-                $post = Post::withoutGlobalScope('user_id')->find($id);
-            else
-                $post = Post::find($id);
+            $post = Post::withoutGlobalScope('user_id')->find($id);
 
             if( ! $post )
                 return $this->failure('Post not exists.');

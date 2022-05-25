@@ -33,7 +33,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/user/unfollow/{user_id}', [UserController::class, 'unFollow'])->name('unFollow.user');
     Route::get('/user/followers', [UserController::class, 'followers'])->name('followers.user');
     Route::get('/user/following', [UserController::class, 'following'])->name('following.user');
-    Route::get('/dashboard', [UserController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/dashboard', [PostController::class, 'dashboard'])->name('admin.dashboard');
     Route::delete('/user/delete/{id}', [UserController::class, 'destroy'])->name('user.delete');
 
     Route::get('/search/posts/{value}', [PostController::class, 'search'])->name('search.posts');
@@ -47,6 +47,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::put('/post/edit/{id}', [PostController::class, 'update'])->name('post.edit');
     Route::delete('/post/delete/{id}', [PostController::class, 'destroy'])->name('post.delete');
 });
+
+Route::get('/is/admin', [AuthController::class, 'isAdmin'])->name('is.admin');
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
