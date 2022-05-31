@@ -69,23 +69,32 @@ class AuthController extends Controller
         );
     }
 
-    public function login(Request $request)
-    {
-        $this->validateLogin($request);
-
-        $user = User::where('email', $request['email'])->first();
-
-        if( ! $user )
+    public function login (Request $request) {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email|max:255',
+            'password' => 'required',
+        ]);
+        if ($validator->fails())
+        {
+            return response(['errors'=>$validator->errors()->all()], 422);
+        }
+        $user = User::where('email', $request->email)->first();
+        if ($user) {
+            if (Hash::check($request->password, $user->password)) {
+                $token = $user->createToken('auth_token')->plainTextToken;
+                return $this->success(
+                    'Hi '.$user->name.', welcome to home',
+                    [
+                        'user' => new UserResource($user),
+                        'token' => $token,
+                    ]
+                );
+            } else {
+                return $this->failure('Unauthorized.');
+            }
+        } else {
             return $this->failure('Unauthorized.');
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-        return $this->success(
-            'Hi '.$user->name.', welcome to home',
-            [
-                'user' => new UserResource($user),
-                'token' => $token,
-            ]
-        );
+        }
     }
 
     public function me(Request $request)
